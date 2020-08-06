@@ -1,0 +1,3 @@
+[DEV01]
+app1  ansible_ssh_host=dasarishravan1c.mylabserver.com
+app2  ansible_ssh_host=dasarishravan7c.mylabserver.com

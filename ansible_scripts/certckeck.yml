@@ -1,0 +1,17 @@
+---
+# Author: Shravan
+
+- hosts: all
+  gather_facts: no
+  remote_user: '{{ ansible_ssh_user }}'
+
+  tasks:
+
+    - name:  replacing env values
+      replace:
+        path: '{{ item.path }}'
+        regexp: '{{ item.regexp1 }}'
+        replace: '{{ item.replace }}'
+      with_items:
+        - { path: '/home/cloud_user/test/*.properties', regexp1: 'abc', replace: 'xyz'}
+        - { path: '/home/cloud_user/test/*.sh', regexp1: '123', replace: '567'}

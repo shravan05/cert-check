@@ -43,7 +43,7 @@ stage ('PrintResult'){
     sh 'cat ${WORKSPACE}/results.txt'
 }
 }
- }catch (e) {
+}catch (e) {
   	    currentBuild.result = "FAILED"
   	    throw e
   	    } finally {

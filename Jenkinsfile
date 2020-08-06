@@ -3,13 +3,14 @@
 /*
 
 **Jenkins File for Scanning iD for all the Environments
-**Author - Shravan Dasari
+**Author - Anudeep Seri
 **Version 1.0
 */
 
 node {
 
 deleteDir()
+
 
 stage('git checkout') {
 
@@ -23,19 +24,19 @@ stage ('playbook run') {
 timestamps {
 	try{
 
+	//notifyBuild('STARTED')
 
-       ansiblePlaybook(
-	     playbook: "${workspace}/ansible_scripts/certckeck.yml",
-	     inventory: "${workspace}/ansible_scripts/inventory/${EnvType}",
-	     colorizedOutput: true,
-	     extras: "-e workspace=${workspace}")
-     }
+	ansiblePlaybook(
+		     playbook: "${workspace}/ansible_scripts/certckeck.yml",
+		     inventory: "${workspace}/ansible_scripts/inventory/${EnvType}",
+		     colorizedOutput: true,
+		     extras: "-e workspace=${workspace}")
 
 stage ('PrintResult'){
 
  if(!fileExists('results.txt')) {
 
-	 sh 'echo Cert was not found ,results.txt doesnot exists'
+	 sh 'echo result was not found ,results.txt doesnot exists'
 
 	 }
  else {
@@ -43,24 +44,27 @@ stage ('PrintResult'){
     sh 'cat ${WORKSPACE}/results.txt'
 }
 }
-}catch (e) {
+ }catch (e) {
   	    currentBuild.result = "FAILED"
   	    throw e
   	    } finally {
   	    notifyBuild(currentBuild.result)
   	}
   }
-  post {
-      always {
-          archiveArtifacts artifacts: '${WORKSPACE}/results.txt',
-          onlyIfSuccessful: true
-      }
-  }
  }
+}
 
 def notifyBuild(String buildStatus = 'STARTED') {
 // build status of null means successful
 buildStatus =  buildStatus ?: 'SUCCESSFUL'
 
-
+emailext(
+attachLog: true,
+attachmentsPattern: 'results.txt',
+to: '${EmailAddress}',
+subject: "${buildStatus} : Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+mimeType: 'text/html',
+body: "Check Console output at $BUILD_URL to view the logs.",
+recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+)
 }

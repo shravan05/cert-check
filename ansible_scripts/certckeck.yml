@@ -17,12 +17,13 @@
       when: inventory_hostname in groups.app7cert
       command: sh ssl-cert-check -c {{certdir}}/dev7cops.crt
       register: app7c
-      debug: msg={{ app7c }} 
+    - debug: msg={{ app7c }}
 
     - name:  get cert info for app1cert
       when: inventory_hostname in groups.app1cert
       command: sh ssl-cert-check -c {{certdir}}/devops1c.crt
       register: app1c
+    - debug: msg={{ app1c }} 
 
     # - lineinfile:
     #     create: yes

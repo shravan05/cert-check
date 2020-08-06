@@ -27,24 +27,13 @@ timestamps {
 	//notifyBuild('STARTED')
 
   ansiColor('xterm') {
-	ansiblePlaybook(
+	  ansiblePlaybook(
 		     playbook: "${workspace}/ansible_scripts/certckeck.yml",
 		     inventory: "${workspace}/ansible_scripts/inventory/${EnvType}",
 		     colorized: true,
 		     extras: "-e workspace=${workspace}")
 	 }
-stage ('PrintResult'){
 
- if(!fileExists('results.txt')) {
-
-	 sh 'echo result was not found ,results.txt doesnot exists'
-
-	 }
- else {
-
-    sh 'cat ${WORKSPACE}/results.txt'
-}
-}
  }catch (e) {
   	    currentBuild.result = "FAILED"
   	    throw e
@@ -59,13 +48,4 @@ def notifyBuild(String buildStatus = 'STARTED') {
 // build status of null means successful
 buildStatus =  buildStatus ?: 'SUCCESSFUL'
 
-emailext(
-attachLog: true,
-attachmentsPattern: 'results.txt',
-to: '${EmailAddress}',
-subject: "${buildStatus} : Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
-mimeType: 'text/html',
-body: "Check Console output at $BUILD_URL to view the logs.",
-recipientProviders: [[$class: 'DevelopersRecipientProvider']]
-)
 }

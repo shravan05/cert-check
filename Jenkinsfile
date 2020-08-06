@@ -30,7 +30,7 @@ timestamps {
 	ansiblePlaybook(
 		     playbook: "${workspace}/ansible_scripts/certckeck.yml",
 		     inventory: "${workspace}/ansible_scripts/inventory/${EnvType}",
-		     colorizedOutput: true,
+		     colorized: true,
 		     extras: "-e workspace=${workspace}")
 	 }
 stage ('PrintResult'){

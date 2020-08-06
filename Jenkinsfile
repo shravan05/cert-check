@@ -26,12 +26,13 @@ timestamps {
 
 	//notifyBuild('STARTED')
 
+  ansiColor('xterm') {
 	ansiblePlaybook(
 		     playbook: "${workspace}/ansible_scripts/certckeck.yml",
 		     inventory: "${workspace}/ansible_scripts/inventory/${EnvType}",
 		     colorizedOutput: true,
 		     extras: "-e workspace=${workspace}")
-
+	 }
 stage ('PrintResult'){
 
  if(!fileExists('results.txt')) {

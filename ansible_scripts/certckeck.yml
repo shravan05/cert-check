@@ -3,7 +3,6 @@
 
 - hosts: all
   gather_facts: no
-  remote_user: '{{ ansible_ssh_user }}'
 
   tasks:
 
@@ -23,7 +22,7 @@
       when: inventory_hostname in groups.app1cert
       command: sh ssl-cert-check -c {{certdir}}/devops1c.crt
       register: app1c
-    - debug: msg={{ app1c }} 
+    - debug: msg={{ app1c }}
 
     # - lineinfile:
     #     create: yes

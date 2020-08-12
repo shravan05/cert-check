@@ -29,28 +29,28 @@
         echo "{{app7c.stdout}}" >> /tmp/input
       delegate_to: localhost
 
-    # - name:  get cert info for app1cert
-    #   when: inventory_hostname in groups.app1cert
-    #   command: sh /tmp/ssl-cert-check -c {{certdir}}/devops1c.crt
-    #   register: app1c
-    #
-    # - name: insert data for cert1
-    #   when: inventory_hostname in groups.app1cert
-    #   shell: |
-    #     echo "{{app1c.stdout}}" | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3, $4, $5 "\"," $6}' >> /tmp/input
-    #   delegate_to: localhost
-    #
-    # - name:  get cert info for app2cert
-    #   when: inventory_hostname in groups.app2cert
-    #   command: sh /tmp/ssl-cert-check -c {{certdir}}/devops2c.crt
-    #   register: app2c
-    #
-    # - name: insert data for cert2
-    #   when: inventory_hostname in groups.app2cert
-    #   shell: |
-    #     echo "{{app2c.stdout}}" | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3, $4, $5 "\"," $6}' >> /tmp/input
-    #   delegate_to: localhost
-    #
-    # - name: convert result to csv
-    #   shell: awk 'BEGIN{ OFS=" "}; {print $1, $2, $3, $4;}' /tmp/input > /tmp/Output.csv
-    #   delegate_to: localhost
+    - name:  get cert info for app1cert
+      when: inventory_hostname in groups.app1cert
+      shell: (echo $(hostname -f); sh /tmp/ssl-cert-check -c {{certdir}}/devops1c.crt | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3, $4, $5 "\"," $6}') | tr '\n' ','
+      register: app1c
+
+    - name: insert data for cert1
+      when: inventory_hostname in groups.app1cert
+      shell: |
+        echo "{{app1c.stdout}}" >> /tmp/input
+      delegate_to: localhost
+
+    - name:  get cert info for app2cert
+      when: inventory_hostname in groups.app2cert
+      command: (echo $(hostname -f); sh /tmp/ssl-cert-check -c {{certdir}}/devops2c.crt | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3, $4, $5 "\"," $6}') | tr '\n' ','
+      register: app2c
+
+    - name: insert data for cert2
+      when: inventory_hostname in groups.app2cert
+      shell: |
+        echo "{{app2c.stdout}}" >> /tmp/input
+      delegate_to: localhost
+
+    - name: convert result to csv
+      shell: awk 'BEGIN{ OFS=" "}; {print $1, $2, $3, $4, $5;}' /tmp/input > /tmp/Output.csv
+      delegate_to: localhost

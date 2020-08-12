@@ -42,7 +42,7 @@
 
     - name:  get cert info for app2cert
       when: inventory_hostname in groups.app2cert
-      command: (echo $(hostname -f); sh /tmp/ssl-cert-check -c {{certdir}}/devops2c.crt | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3, $4, $5 "\"," $6}') | tr '\n' ','
+      shell: (echo $(hostname -f); sh /tmp/ssl-cert-check -c {{certdir}}/devops2c.crt | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3, $4, $5 "\"," $6}') | tr '\n' ','
       register: app2c
 
     - name: insert data for cert2

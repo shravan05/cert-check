@@ -16,41 +16,42 @@
       file: path='/tmp/input' state=absent
       delegate_to: localhost
 
-    - local_action: lineinfile create=yes dest=/tmp/input line="Host,Status,Expires,Days" insertafter=EOF
+    - local_action: lineinfile create=yes dest=/tmp/input line="Hostname,Certfile,Status,Expires,Days" insertafter=EOF
 
     - name:  get cert info for app7
       when: inventory_hostname in groups.app7cert
-      command: sh /tmp/ssl-cert-check -c {{certdir}}/devops5.crt
+      shell: (echo $(hostname -f); sh /tmp/ssl-cert-check -c {{certdir}}/devops5.crt | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3,
+>  $4, $5 "\"," $6}') | tr '\n' ','
       register: app7c
 
     - name: insert data for cert7
       when: inventory_hostname in groups.app7cert
       shell: |
-        echo "{{app7c.stdout}}" | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3, $4, $5 "\"," $6}' >> /tmp/input
+        echo "{{app7c.stdout}}" >> /tmp/input
       delegate_to: localhost
 
-    - name:  get cert info for app1cert
-      when: inventory_hostname in groups.app1cert
-      command: sh /tmp/ssl-cert-check -c {{certdir}}/devops1c.crt
-      register: app1c
-
-    - name: insert data for cert1
-      when: inventory_hostname in groups.app1cert
-      shell: |
-        echo "{{app1c.stdout}}" | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3, $4, $5 "\"," $6}' >> /tmp/input
-      delegate_to: localhost
-
-    - name:  get cert info for app2cert
-      when: inventory_hostname in groups.app2cert
-      command: sh /tmp/ssl-cert-check -c {{certdir}}/devops2c.crt
-      register: app2c
-
-    - name: insert data for cert2
-      when: inventory_hostname in groups.app2cert
-      shell: |
-        echo "{{app2c.stdout}}" | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3, $4, $5 "\"," $6}' >> /tmp/input
-      delegate_to: localhost
-
-    - name: convert result to csv
-      shell: awk 'BEGIN{ OFS=" "}; {print $1, $2, $3, $4;}' /tmp/input > /tmp/Output.csv
-      delegate_to: localhost
+    # - name:  get cert info for app1cert
+    #   when: inventory_hostname in groups.app1cert
+    #   command: sh /tmp/ssl-cert-check -c {{certdir}}/devops1c.crt
+    #   register: app1c
+    #
+    # - name: insert data for cert1
+    #   when: inventory_hostname in groups.app1cert
+    #   shell: |
+    #     echo "{{app1c.stdout}}" | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3, $4, $5 "\"," $6}' >> /tmp/input
+    #   delegate_to: localhost
+    #
+    # - name:  get cert info for app2cert
+    #   when: inventory_hostname in groups.app2cert
+    #   command: sh /tmp/ssl-cert-check -c {{certdir}}/devops2c.crt
+    #   register: app2c
+    #
+    # - name: insert data for cert2
+    #   when: inventory_hostname in groups.app2cert
+    #   shell: |
+    #     echo "{{app2c.stdout}}" | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3, $4, $5 "\"," $6}' >> /tmp/input
+    #   delegate_to: localhost
+    #
+    # - name: convert result to csv
+    #   shell: awk 'BEGIN{ OFS=" "}; {print $1, $2, $3, $4;}' /tmp/input > /tmp/Output.csv
+    #   delegate_to: localhost

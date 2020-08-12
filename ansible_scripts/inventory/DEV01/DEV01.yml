@@ -1,9 +1,13 @@
 [DEV01]
-app1  ansible_ssh_host=dasarishravan1c.mylabserver.com  ansible_ssh_user=cloud_user
-app7  ansible_ssh_host=dasarishravan7c.mylabserver.com  ansible_ssh_user=cloud_user
+dasarishravan1c		ansible_ssh_host=dasarishravan1c.mylabserver.com		ansible_ssh_user=cloud_user
+dasarishravan7c		ansible_ssh_host=dasarishravan5c.mylabserver.com		ansible_ssh_user=cloud_user
+dasarishravan2c		ansible_ssh_host=dasarishravan2c.mylabserver.com		ansible_ssh_user=cloud_user
 
 [app1cert]
-app1
+dasarishravan1c
 
 [app7cert]
-app7
+dasarishravan7c
+
+[app2cert]
+dasarishravan2c

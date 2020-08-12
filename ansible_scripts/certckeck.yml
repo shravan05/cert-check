@@ -12,22 +12,45 @@
         dest: "/tmp"
         mode: '0755'
 
+    - name: delete the input file
+      file: path='/tmp/input' state=absent
+      delegate_to: localhost
+
+    - local_action: lineinfile create=yes dest=/tmp/input line="Host,Status,Expires,Days" insertafter=EOF
+
     - name:  get cert info for app7
       when: inventory_hostname in groups.app7cert
-      command: sh ssl-cert-check -c {{certdir}}/dev7cops.crt
+      command: sh /tmp/ssl-cert-check -c {{certdir}}/devops5.crt
       register: app7c
-    - debug: msg={{ app7c }}
+
+    - name: insert data for cert7
+      when: inventory_hostname in groups.app7cert
+      shell: |
+        echo "{{app7c.stdout}}" | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3, $4, $5 "\"," $6}' >> /tmp/input
+      delegate_to: localhost
 
     - name:  get cert info for app1cert
       when: inventory_hostname in groups.app1cert
-      command: sh ssl-cert-check -c {{certdir}}/devops1c.crt
+      command: sh /tmp/ssl-cert-check -c {{certdir}}/devops1c.crt
       register: app1c
-    - debug: msg={{ app1c }}
 
-    # - lineinfile:
-    #     create: yes
-    #     path: "{{workspace}}/results.txt"
-    #     line: "{{op.stdout}}"
-    #     insertbefore: BOF
-    #   when: not(op|skipped)
-    #   delegate_to: localhost
+    - name: insert data for cert1
+      when: inventory_hostname in groups.app1cert
+      shell: |
+        echo "{{app1c.stdout}}" | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3, $4, $5 "\"," $6}' >> /tmp/input
+      delegate_to: localhost
+
+    - name:  get cert info for app2cert
+      when: inventory_hostname in groups.app2cert
+      command: sh /tmp/ssl-cert-check -c {{certdir}}/devops2c.crt
+      register: app2c
+
+    - name: insert data for cert2
+      when: inventory_hostname in groups.app2cert
+      shell: |
+        echo "{{app2c.stdout}}" | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3, $4, $5 "\"," $6}' >> /tmp/input
+      delegate_to: localhost
+
+    - name: convert result to csv
+      shell: awk 'BEGIN{ OFS=" "}; {print $1, $2, $3, $4;}' /tmp/input > /tmp/Output.csv
+      delegate_to: localhost

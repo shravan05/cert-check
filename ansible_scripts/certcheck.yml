@@ -20,8 +20,7 @@
 
     - name:  get cert info for app7
       when: inventory_hostname in groups.app7cert
-      shell: (echo $(hostname -f); sh /tmp/ssl-cert-check -c {{certdir}}/devops5.crt | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3,
->  $4, $5 "\"," $6}') | tr '\n' ','
+      shell: (echo $(hostname -f); sh /tmp/ssl-cert-check -c {{certdir}}/devops5.crt | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3, $4, $5 "\"," $6}') | tr '\n' ','
       register: app7c
 
     - name: insert data for cert7

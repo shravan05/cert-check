@@ -20,35 +20,35 @@
 
     - name:  get cert info for app7
       when: inventory_hostname in groups.app7cert
-      shell: (echo $(hostname -f); sh /tmp/ssl-cert-check -c {{certdir}}/devops5.crt | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3, $4, $5 "\"," $6}') | tr '\n' ','
+      shell: ((echo $(hostname -f); sh /tmp/ssl-cert-check -c {{certdir}}/devops5.crt | sed -n '4 p') | tr '\n' '\t')
       register: app7c
 
     - name: insert data for cert7
       when: inventory_hostname in groups.app7cert
       shell: |
-        echo "{{app7c.stdout}}" >> /tmp/input
+        echo "{{app7c.stdout}}" | awk {'print $1 "," $2 "," $3",\"" $4, $5, $6 "\"," $7'} >> /tmp/input
       delegate_to: localhost
 
     - name:  get cert info for app1cert
       when: inventory_hostname in groups.app1cert
-      shell: (echo $(hostname -f); sh /tmp/ssl-cert-check -c {{certdir}}/devops1c.crt | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3, $4, $5 "\"," $6}') | tr '\n' ','
+      shell: ((echo $(hostname -f); sh /tmp/ssl-cert-check -c {{certdir}}/devops1c.crt | sed -n '4 p') | tr '\n' '\t')
       register: app1c
 
     - name: insert data for cert1
       when: inventory_hostname in groups.app1cert
       shell: |
-        echo "{{app1c.stdout}}" >> /tmp/input
+        echo "{{app1c.stdout}}" | awk {'print $1 "," $2 "," $3",\"" $4, $5, $6 "\"," $7'} >> /tmp/input
       delegate_to: localhost
 
     - name:  get cert info for app2cert
       when: inventory_hostname in groups.app2cert
-      shell: (echo $(hostname -f); sh /tmp/ssl-cert-check -c {{certdir}}/devops2c.crt | sed -n '4 p' | awk '{ print $1 "," $2 ",\"" $3, $4, $5 "\"," $6}') | tr '\n' ','
+      shell: ((echo $(hostname -f); sh /tmp/ssl-cert-check -c {{certdir}}/devops2c.crt | sed -n '4 p') | tr '\n' '\t')
       register: app2c
 
     - name: insert data for cert2
       when: inventory_hostname in groups.app2cert
       shell: |
-        echo "{{app2c.stdout}}" >> /tmp/input
+        echo "{{app2c.stdout}}" | awk {'print $1 "," $2 "," $3",\"" $4, $5, $6 "\"," $7'} >> /tmp/input
       delegate_to: localhost
 
     - name: convert result to csv
